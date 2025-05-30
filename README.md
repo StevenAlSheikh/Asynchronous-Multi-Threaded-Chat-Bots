@@ -1,4 +1,4 @@
-CS480 Summer 2024 Programming Assignment 1 Instructions:
+## Operating Systems Programming Assignment 1 Instructions:
 
 You shall implement a program where several chat bots will run, each in their own thread, simultaneously but asynchronously with each other.  Each bot shall write the specified text message to one, common shared resource, a file named QUOTE.txt.  In order to prevent the data from getting corrupted by other bots, the bots shall use an appropriate IPC mechanism/algorithm.
 
