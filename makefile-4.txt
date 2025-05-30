@@ -1,0 +1,19 @@
+# Team members:
+# Name: Steven Al-Sheikh
+# RedID: 826493311
+# Edoras: cssc4457 (used for project)
+# 
+# Name: Moe Jawadi
+# RedID: 826061178
+# Edoras: cssc4444
+#
+# Class: CS 480, Summer 2024
+# Programming Assignment #1 - Bots and Resource Synchronization
+# Name of File: makefile
+
+bots: Bots.cpp
+	g++ -pthread -std=c++11 -o bots Bots.cpp
+	./bots
+
+clean:
+	rm -f bots QUOTE.txt
