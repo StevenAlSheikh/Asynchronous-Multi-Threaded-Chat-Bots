@@ -1,53 +1,78 @@
-## Operating Systems Programming Assignment 1 Instructions:
+# Multi-Threaded Chat Bots with Semaphore Synchronization
 
-You shall implement a program where several chat bots will run, each in their own thread, simultaneously but asynchronously with each other.  Each bot shall write the specified text message to one, common shared resource, a file named QUOTE.txt.  In order to prevent the data from getting corrupted by other bots, the bots shall use an appropriate IPC mechanism/algorithm.
+## Project Description
 
-You will do this by developing a project that manages multiple threads writing to a shared file (you aren’t building a chat server, the chat bots each will simply write to a shared/common file).
+This project implements a multi-threaded program where seven concurrent chat bot threads write messages to a shared file (`QUOTE.txt`). The goal is to safely coordinate access to this shared resource using POSIX semaphores to avoid race conditions and data corruption. Each bot runs in its own thread and performs asynchronous writes to the file, adhering to a specific timing pattern and synchronization protocol.
 
-You must work in pairs (team of 2) unless approved by the instructor.
+## Project Specifications
 
-When your program starts, it shall do the following:
-Create a file, named QUOTE.txt, in the current directory (cwd).
-Have your running process write it’s pid (Process ID) followed by a Carriage Return and Newline into the file.
-Close the file QUOTE.txt
-Create a semaphore named FLAG which the threads will use to manage access to the file QUOTE.txt.
-Create 7 threads.  Use the POSIX version of threads (i.e.,  pthread_create())
-Block/wait for all seven threads to complete their work.
-Once all threads are done, destroy the semaphore, then exit gracefully, printing a friendly message to the console
- 
+- A file named `QUOTE.txt` is created in the current working directory at program startup.
+- The program writes the main process ID (PID) followed by a carriage return and newline to `QUOTE.txt`.
+- A POSIX semaphore named `FLAG` is created and used to manage exclusive access to the file.
+- Seven threads are created using `pthread_create()`. Each thread runs concurrently.
+- Threads are categorized as follows:
+  - Even-numbered threads (0, 2, 4, 6) perform actions every **2 seconds**.
+  - Odd-numbered threads (1, 3, 5) perform actions every **3 seconds**.
+- Each thread:
+  - Waits to acquire the semaphore `FLAG`.
+  - Opens `QUOTE.txt` and writes its thread ID (TID) and a quote, followed by a carriage return and newline.
+  - Prints to the console: `Thread <thread id> is running`.
+  - Closes the file and releases the semaphore.
+  - Repeats this process **8 times** before exiting.
+- The main process blocks until all threads complete.
+- After all threads finish execution, the semaphore is destroyed.
+- A friendly exit message is displayed to the console.
 
-Each thread shall perform the following (note, each thread is running concurrently):
-Periodically (even numbered threads - once every two seconds, odd numbered threads – once every 3 seconds) get the semaphore FLAG; once the thread has FLAG, it will proceed to do the following:
-Open the file QUOTE.txt and write the thread’s tid (thread id) followed by “The Quote” (followed by a Carriage Return and Newline)
-Write to the console (print to stdout) “Thread <thread id> is running” followed by a newline
-Close the file QUOTE.txt
-Release the semaphore FLAG
-Repeat the above 7 times (they run a total of 8 times).
-exit
-You will need to use the following POSIX system calls for creating and managing the semaphores with: sem_init(), sem_wait(), sem_post(), and sem_destroy().
+## How to Compile and Run
 
-I will test your program by compiling it and executing it on edoras. Your program shall be written such that it compiles and executes cleanly when using the gcc, or g++ compiler You shall create a sub-directory named "a1" in your home directory. In it, you shall place your source file(s), your header file, your Makefile (see Canvas for examples on Makefiles), and a README file (see Canvas for README requirements). Your source files SHALL CONTAIN sufficient comments for making the source easy to read. Points will be taken off for poorly (or non) commented source. Name the executable "bots".
+A `Makefile` is provided to build the project.
 
-Create ~/a1 by hand.
-Create source files, an include file, a Makefile, and a README file. Put them into ~/a1.
-The Makefile shall create an executable named "bots" in this same directory (~/a1).
-Here is a nice overview of threads [https://computing.llnl.gov/tutorials/pthreads/]
-The system call "system()" will NOT be allowed
-TURNING IN YOUR WORK:
+```bash
+# Navigate to the project directory
+cd ~/a1
 
-Your project files shall be loaded onto Assignment #1 on Canvas, in the class account of one of the team members.  Be sure to write each
+# Build the executable
+make
 
-Make sure that all of your files (all source files, Makefile, README file, test files, etc) are in the a1 sub-directory of one of your class account
+# Run the program
+./bots
+```
 
-Before loading files onto Canvas, create a single zip file or a tarball (tar file) with all project files.  Then, Attach File (upload it) under Assignment Submission in Assignment #1 (only one team member turns in the assignment on Canvas).  Next, Attach the README file.  Before submitting your project, include the names and class accounts of both team members and identify which account to be used for testing, then submit your project.
+## 📂 Project Structure
 
-The Quote:
+```
+a1/
+├── bots.c            # Main source file with thread and semaphore logic
+├── bots.h            # Header file (function prototypes, includes)
+├── Makefile          # Builds the 'bots' executable
+├── README.md         # Project documentation
+├── QUOTE.txt         # Output file written by bots (created at runtime)
+```
 
-Even numbered threads:  “Controlling complexity is the essence of computer programming.
+## System Calls & APIs Used
 
- --Brian Kernigan
+- `pthread_create()`, `pthread_join()`
+- `sem_init()`, `sem_wait()`, `sem_post()`, `sem_destroy()`
+- `fopen()`, `fprintf()`, `fclose()`, `sleep()`
+- `getpid()`, `pthread_self()`
 
-Odd numbered threads:  “Computer science is no more about computers than astronomy is about telescopes.”    
+## Synchronization Strategy
 
- --Edsger Dijkstra
+- A binary semaphore (`FLAG`) is used to enforce mutual exclusion.
+- Only one thread may access and write to `QUOTE.txt` at a time.
+- This prevents race conditions and ensures consistent, uncorrupted output.
+
+## Requirements Summary
+
+- Must compile and execute cleanly on **edoras** using `gcc` or `g++`.
+- Must not use `system()` system call.
+- All source code must be well-commented and readable.
+- Submission must include:
+  - All source files
+  - Makefile
+  - README.md
+  - Zip or tar archive uploaded to Canvas
+
+
+
 
